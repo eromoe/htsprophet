@@ -108,7 +108,7 @@ def plotWeekly(dictframe, ax, uncertainty, weeklyStart, color='#0072B2'):
         ax.fill_between(range(len(days)),dictframe['weekly_lower'][ind], dictframe['weekly_upper'][ind],color=color, alpha=0.2)
     ax.grid(True, which='major', c='gray', ls='-', lw=1, alpha=0.2)
     ax.set_xticks(range(len(days)))
-    ax.set_xticklabels(dictframe['ds'][ind].dt.weekday_name)
+    ax.set_xticklabels(dictframe['ds'][ind].dt.day_name())
     ax.set_xlabel('Day of week')
     ax.set_ylabel('weekly')
     figW.tight_layout()
@@ -155,8 +155,11 @@ def plotHolidays(dictframe, holidays, ax, uncertainty, color='#0072B2'):
         figH = ax.get_figure()
     holidayComps = holidays.holiday.unique().tolist()
     yHoliday = dictframe[holidayComps].sum(1)
-    yHolidayL = dictframe[[h + '_lower' for h in holidayComps]].sum(1)
-    yHolidayU = dictframe[[h + '_upper' for h in holidayComps]].sum(1)
+
+    HL_cols = list(set([h + '_lower' for h in holidayComps]) & set(dictframe.columns))
+    HU_cols = list(set([h + '_upper' for h in holidayComps]) & set(dictframe.columns))
+    yHolidayL = dictframe[HL_cols].sum(1)
+    yHolidayU = dictframe[HU_cols].sum(1)
     # NOTE the above CI calculation is incorrect if holidays overlap
     # in time. Since it is just for the visualization we will not
     # worry about it now.
